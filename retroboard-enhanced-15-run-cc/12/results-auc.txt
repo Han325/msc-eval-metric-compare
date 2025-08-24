@@ -1,0 +1,17 @@
+--- Step 1: Calculating Final Branch Coverage ---
+Found last report file: /home/vagrant-cc-enhanced/workspace/test-generation-results/resultsRetroboard/12/testretroboardLLM_0/coverage-report4.txt
+Extracted final branch coverage value: 71.93
+
+Final Branch Coverage: 71.93%
+-------------------------------------
+
+--- Step 2: Preparing data for AUC Calculation ---
+  - Processing file: coverage-report0.txt, Timestamp: 1754988762, Coverage: 67.25
+  - Processing file: coverage-report1.txt, Timestamp: 1754988782, Coverage: 67.25
+  - Processing file: coverage-report2.txt, Timestamp: 1754988824, Coverage: 67.25
+  - Processing file: coverage-report3.txt, Timestamp: 1754988850, Coverage: 67.84
+  - Processing file: coverage-report4.txt, Timestamp: 1754988875, Coverage: 71.93
+
+--- Step 3: Final AUC Result ---
+AUC (Branch Coverage vs. Time): 76.7279
+(This value represents 'coverage-percent-seconds')

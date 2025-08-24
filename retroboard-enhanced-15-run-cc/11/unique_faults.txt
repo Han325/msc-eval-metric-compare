@@ -1,0 +1,3 @@
+--- Unique JavaScript Faults (from all tests) ---
+http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+--- End of Unique Faults ---
