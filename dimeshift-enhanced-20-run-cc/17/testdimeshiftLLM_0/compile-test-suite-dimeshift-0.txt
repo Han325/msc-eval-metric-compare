@@ -1,0 +1,23 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-----------------------< [0;36mdimeshift:pageobjects[0;1m >------------------------[m
+[[1;34mINFO[m] [1mBuilding pageobjects 1.0-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-clean-plugin:2.5:clean[m [1m(default-clean)[m @ [36mpageobjects[0;1m ---[m
+[[1;34mINFO[m] Deleting /home/vagrant-cc-enhanced/workspace/fse2019/dimeshift/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:2.6:resources[m [1m(default-resources)[m @ [36mpageobjects[0;1m ---[m
+[[1;33mWARNING[m] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[[1;34mINFO[m] Copying 1 resource
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.7.0:compile[m [1m(default-compile)[m @ [36mpageobjects[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;33mWARNING[m] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[[1;34mINFO[m] Compiling 84 source files to /home/vagrant-cc-enhanced/workspace/fse2019/dimeshift/target/classes
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  24.388 s
+[[1;34mINFO[m] Finished at: 2025-08-28T20:57:26Z
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m

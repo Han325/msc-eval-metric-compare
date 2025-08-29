@@ -15,13 +15,13 @@ def load_all_coverage_files(base_dir, tool_name):
     Returns a list of (run_number, coverage_data) tuples.
     """
     coverage_files = []
-    tool_dir = Path(base_dir) / f"dimeshift-{tool_name}-15-run-cc"
+    tool_dir = Path(base_dir) / f"dimeshift-{tool_name}-20-run-cc"
     
     if not tool_dir.exists():
         print(f"Error: Directory {tool_dir} not found", file=sys.stderr)
         return []
-    
-    for run_num in range(1, 16):  # 1 to 15
+
+    for run_num in range(1, 21):  # 1 to 20
         coverage_file = tool_dir / str(run_num) / "testdimeshiftLLM_0" / "coverage-final.json"
         
         if coverage_file.exists():
@@ -143,7 +143,7 @@ def load_auc_data(base_dir, tool_name):
     Load AUC data for a given tool from both fault-auc.txt and results-auc.txt files.
     Returns dict with run data.
     """
-    tool_dir = Path(base_dir) / f"dimeshift-{tool_name}-15-run-cc"
+    tool_dir = Path(base_dir) / f"dimeshift-{tool_name}-20-run-cc"
     auc_data = {
         'fault_scores': [],
         'branch_coverage_final': [],
@@ -151,7 +151,7 @@ def load_auc_data(base_dir, tool_name):
         'run_numbers': []
     }
     
-    for run_num in range(1, 16):
+    for run_num in range(1, 21):
         run_dir = tool_dir / str(run_num)
         
         # Parse fault-auc.txt
@@ -211,30 +211,7 @@ def format_branch_info(branch_key, baseline_coverage=None, enhanced_coverage=Non
                 break
     
     return f"📂 {file_path} - Branch #{branch_id} (path {path_index}) at {location_info}"
-    """
-    Format branch information for display.
-    """
-    file_path, branch_id, path_index = branch_key
     
-    # Try to get location info from either coverage data
-    location_info = "Unknown location"
-    
-    for coverage_files in [baseline_coverage, enhanced_coverage]:
-        if coverage_files:
-            for run_num, coverage_data in coverage_files:
-                if file_path in coverage_data:
-                    branch_map = coverage_data[file_path].get('branchMap', {})
-                    if branch_id in branch_map:
-                        locations = branch_map[branch_id].get('locations', [])
-                        if path_index < len(locations):
-                            loc = locations[path_index]
-                            location_info = f"Line {loc['start']['line']}, Col {loc['start']['column']}"
-                            break
-            if location_info != "Unknown location":
-                break
-    
-    return f"📂 {file_path} - Branch #{branch_id} (path {path_index}) at {location_info}"
-
 
 def analyze_test_patterns(run_numbers, tool_name):
     """Analyze patterns in test suites for given runs."""
@@ -245,7 +222,7 @@ def analyze_test_patterns(run_numbers, tool_name):
     }
     
     for run in run_numbers:
-        test_file = f"dimeshift-{tool_name}-15-run-cc/{run}/testdimeshiftLLM_0/main/ClassUnderTestApogen_ESTest.java"
+        test_file = f"dimeshift-{tool_name}-20-run-cc/{run}/testdimeshiftLLM_0/main/ClassUnderTestApogen_ESTest.java"
         
         if os.path.exists(test_file):
             try:
@@ -294,7 +271,7 @@ def copy_relevant_test_files(only_in_enhanced, enhanced_files, enhanced_hit_freq
         
         # Copy all test files for this branch into its folder
         for run in hitting_runs:
-            source_file = f"dimeshift-enhanced-15-run-cc/{run}/testdimeshiftLLM_0/main/ClassUnderTestApogen_ESTest.java"
+            source_file = f"dimeshift-enhanced-20-run-cc/{run}/testdimeshiftLLM_0/main/ClassUnderTestApogen_ESTest.java"
             if os.path.exists(source_file):
                 dest_file = branch_folder / f"run{run}_test.java"
                 
@@ -426,7 +403,7 @@ def analyze_coverage_comparison(base_dir="."):
         if only_in_enhanced:
             for branch in sorted(only_in_enhanced):
                 hits = enhanced_hit_freq[branch]
-                f.write(f"- {format_branch_info(branch, baseline_files, enhanced_files)} (hit in {hits}/15 runs)\n")
+                f.write(f"- {format_branch_info(branch, baseline_files, enhanced_files)} (hit in {hits}/20 runs)\n")
             # Add run-specific analysis for unique enhanced branches
             f.write("\n#### Detailed Run Analysis for Enhanced-Only Branches\n\n")
             for branch in sorted(only_in_enhanced):
@@ -439,7 +416,7 @@ def analyze_coverage_comparison(base_dir="."):
 
                 f.write(f"**{format_branch_info(branch, baseline_files, enhanced_files)}**\n")
                 f.write(f"- Hit in runs: {hitting_runs}\n")
-                f.write(f"- Test suites to examine: `dimeshift-enhanced-15-run-cc/{'/testdimeshiftLLM_0/, '.join(map(str, hitting_runs))}/testdimeshiftLLM_0/`\n\n")
+                f.write(f"- Test suites to examine: `dimeshift-enhanced-20-run-cc/{'/testdimeshiftLLM_0/, '.join(map(str, hitting_runs))}/testdimeshiftLLM_0/`\n\n")
 
                 # Add pattern analysis
                 if hitting_runs:
@@ -457,7 +434,7 @@ def analyze_coverage_comparison(base_dir="."):
         if only_in_baseline:
             for branch in sorted(only_in_baseline):
                 hits = baseline_hit_freq[branch]
-                f.write(f"- {format_branch_info(branch, baseline_files, enhanced_files)} (hit in {hits}/15 runs)\n")
+                f.write(f"- {format_branch_info(branch, baseline_files, enhanced_files)} (hit in {hits}/20 runs)\n")
         else:
             f.write("*None found*\n")
         
@@ -469,7 +446,7 @@ def analyze_coverage_comparison(base_dir="."):
         if enhanced_more_consistent:
             for branch, enhanced_hits, baseline_hits in sorted(enhanced_more_consistent):
                 f.write(f"- {format_branch_info(branch, baseline_files, enhanced_files)}\n")
-                f.write(f"  - Enhanced: {enhanced_hits}/15 runs, Baseline: {baseline_hits}/15 runs\n")
+                f.write(f"  - Enhanced: {enhanced_hits}/20 runs, Baseline: {baseline_hits}/20 runs\n")
         else:
             f.write("*None found*\n")
         
@@ -479,7 +456,7 @@ def analyze_coverage_comparison(base_dir="."):
         if baseline_more_consistent:
             for branch, baseline_hits, enhanced_hits in sorted(baseline_more_consistent):
                 f.write(f"- {format_branch_info(branch, baseline_files, enhanced_files)}\n")
-                f.write(f"  - Baseline: {baseline_hits}/15 runs, Enhanced: {enhanced_hits}/15 runs\n")
+                f.write(f"  - Baseline: {baseline_hits}/20 runs, Enhanced: {enhanced_hits}/20 runs\n")
         else:
             f.write("*None found*\n")
         

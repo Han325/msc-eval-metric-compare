@@ -1,0 +1,4 @@
+Name: Statements Percentage: 39.86% Fraction: 1108/2780
+Name: Branches Percentage: 32.41% Fraction: 350/1080
+Name: Functions Percentage: 41.46% Fraction: 233/562
+Name: Lines Percentage: 40.02% Fraction: 1107/2766

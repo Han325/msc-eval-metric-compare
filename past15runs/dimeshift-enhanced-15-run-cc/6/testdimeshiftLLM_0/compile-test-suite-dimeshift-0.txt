@@ -1,0 +1,18 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGILL (0x4) at pc=0x00007f3aed25fba3, pid=17228, tid=0x00007f3b03b29700
+#
+# JRE version: OpenJDK Runtime Environment (8.0_362-b09) (build 1.8.0_362-8u372-ga~us1-0ubuntu1~18.04-b09)
+# Java VM: OpenJDK 64-Bit Server VM (25.362-b09 mixed mode linux-amd64 compressed oops)
+# Problematic frame:
+# J 509 C1 sun.nio.cs.UTF_8$Decoder.decodeArrayLoop(Ljava/nio/ByteBuffer;Ljava/nio/CharBuffer;)Ljava/nio/charset/CoderResult; (691 bytes) @ 0x00007f3aed25fba3 [0x00007f3aed25fb80+0x23]
+#
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# An error report file with more information is saved as:
+# /home/vagrant-cc-enhanced/workspace/codecoverage/hs_err_pid17228.log
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.java.com/bugreport/crash.jsp
+#

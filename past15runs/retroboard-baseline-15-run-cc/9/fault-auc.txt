@@ -1,0 +1,71 @@
+--- STARTING DIAGNOSTIC RUN ---
+### STEP 1: Reading CSV file from: /home/vagrant-code-coverage/Desktop/fault_discovery_rate.csv
+
+### STEP 2: RAW DATA FROM CSV ###
+This is the ENTIRE content of the CSV file:
+   test_case_number  cumulative_unique_faults
+0                 1                         1
+1                 2                         1
+2                 3                         1
+3                 4                         1
+4                 5                         1
+5                 6                         1
+6                 7                         1
+---------------------------------
+
+### STEP 3: KEY VARIABLES ###
+Max faults found (max_faults): 1
+Total number of tests (max_tests): 7
+-----------------------------
+
+### STEP 4: AREA CALCULATION LOOP ###
+Calculating the area under the curve piece by piece...
+  - Interval 1 (between test 1 and 2):
+    - Faults at end of previous test: 1
+    - Faults at end of current test:  1
+    - Area of this piece: (1 + 1) / 2 = 1.0
+    - Running total for actual_area: 1.0
+  - Interval 2 (between test 2 and 3):
+    - Faults at end of previous test: 1
+    - Faults at end of current test:  1
+    - Area of this piece: (1 + 1) / 2 = 1.0
+    - Running total for actual_area: 2.0
+  - Interval 3 (between test 3 and 4):
+    - Faults at end of previous test: 1
+    - Faults at end of current test:  1
+    - Area of this piece: (1 + 1) / 2 = 1.0
+    - Running total for actual_area: 3.0
+  - Interval 4 (between test 4 and 5):
+    - Faults at end of previous test: 1
+    - Faults at end of current test:  1
+    - Area of this piece: (1 + 1) / 2 = 1.0
+    - Running total for actual_area: 4.0
+  - Interval 5 (between test 5 and 6):
+    - Faults at end of previous test: 1
+    - Faults at end of current test:  1
+    - Area of this piece: (1 + 1) / 2 = 1.0
+    - Running total for actual_area: 5.0
+  - Interval 6 (between test 6 and 7):
+    - Faults at end of previous test: 1
+    - Faults at end of current test:  1
+    - Area of this piece: (1 + 1) / 2 = 1.0
+    - Running total for actual_area: 6.0
+
+  >>> FINAL Calculated Area (actual_area): 6.0
+-----------------------------------
+
+### STEP 5: 'PERFECT' SCENARIO CALCULATION ###
+Max faults (1) * (Number of tests (7) - 1) = 6
+  >>> 'Perfect' Area (perfect_area): 6
+------------------------------------------
+
+### STEP 6: FINAL SCORE CALCULATION ###
+  >>> Final Score = actual_area (6.0) / perfect_area (6) = 1.0
+-------------------------------------
+
+
+--- Fault Discovery Analysis ---
+Analysis complete. Plot saved to '/home/vagrant-code-coverage/Desktop/discovery_curve.png'
+A score of 1.0 represents a perfect test suite (all faults found on the first test).
+Your Test Suite's Discovery Score: 1.0000
+

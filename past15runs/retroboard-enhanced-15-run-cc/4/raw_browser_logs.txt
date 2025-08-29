@@ -1,0 +1,10 @@
+--- Raw Browser Console Logs (from all tests) ---
+Tue Aug 12 07:17:05 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+Tue Aug 12 07:17:15 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+Tue Aug 12 07:17:16 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+Tue Aug 12 07:18:22 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+Tue Aug 12 07:18:27 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+Tue Aug 12 07:18:27 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+Tue Aug 12 07:18:28 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+Tue Aug 12 07:18:28 UTC 2025 SEVERE http://webapp:8080/assets/app.0.10.0.js 30:42692 Uncaught TypeError: e.refs.input.focus is not a function
+--- End of Raw Logs ---

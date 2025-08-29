@@ -1,0 +1,10 @@
+--- Unique JavaScript Faults (from all tests) ---
+http://localhost:35729/livereload.js - Failed to load resource: net::ERR_CONNECTION_REFUSED
+http://webapp:8080/api/users/5/wallets?_=1756453399708 - Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+http://webapp:8080/api/users/2/wallets?_=1756453341173 - Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+http://webapp:8080/scripts/app/views/parts/transactions.js 1:1922 "views/parts/transactions.js | Waking up"
+http://webapp:8080/api/users/1/wallets?_=1756453311885 - Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+http://webapp:8080/api/users/3/wallets?_=1756453357311 - Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+http://webapp:8080/api/users/4/wallets?_=1756453382301 - Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+http://webapp:8080/scripts/app/views/parts/wallet_plans.js 1:1022 "views/parts/wallet_plans.js | Waking up"
+--- End of Unique Faults ---

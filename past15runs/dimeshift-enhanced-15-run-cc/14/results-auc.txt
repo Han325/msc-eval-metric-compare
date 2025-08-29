@@ -1,0 +1,18 @@
+--- Step 1: Calculating Final Branch Coverage ---
+Found last report file: /home/vagrant-cc-enhanced/workspace/test-generation-results/resultsDimeshift/14/testdimeshiftLLM_0/coverage-report5.txt
+Extracted final branch coverage value: 40.93
+
+Final Branch Coverage: 40.93%
+-------------------------------------
+
+--- Step 2: Preparing data for AUC Calculation ---
+  - Processing file: coverage-report0.txt, Timestamp: 1755392902, Coverage: 28.98
+  - Processing file: coverage-report1.txt, Timestamp: 1755392937, Coverage: 39.72
+  - Processing file: coverage-report2.txt, Timestamp: 1755392960, Coverage: 40.09
+  - Processing file: coverage-report3.txt, Timestamp: 1755392984, Coverage: 40.74
+  - Processing file: coverage-report4.txt, Timestamp: 1755393005, Coverage: 40.83
+  - Processing file: coverage-report5.txt, Timestamp: 1755393022, Coverage: 40.93
+
+--- Step 3: Final AUC Result ---
+AUC (Branch Coverage vs. Time): 46.4147
+(This value represents 'coverage-percent-seconds')

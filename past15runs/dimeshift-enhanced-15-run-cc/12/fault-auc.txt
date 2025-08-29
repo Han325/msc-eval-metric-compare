@@ -1,0 +1,53 @@
+--- STARTING DIAGNOSTIC RUN ---
+### STEP 1: Reading CSV file from: /home/vagrant-cc-enhanced/Desktop/fault_discovery_rate.csv
+
+### STEP 2: RAW DATA FROM CSV ###
+This is the ENTIRE content of the CSV file:
+   test_case_number  cumulative_unique_faults
+0                 1                         1
+1                 2                         2
+2                 3                         3
+3                 4                         4
+---------------------------------
+
+### STEP 3: KEY VARIABLES ###
+Max faults found (max_faults): 4
+Total number of tests (max_tests): 4
+-----------------------------
+
+### STEP 4: AREA CALCULATION LOOP ###
+Calculating the area under the curve piece by piece...
+  - Interval 1 (between test 1 and 2):
+    - Faults at end of previous test: 1
+    - Faults at end of current test:  2
+    - Area of this piece: (2 + 1) / 2 = 1.5
+    - Running total for actual_area: 1.5
+  - Interval 2 (between test 2 and 3):
+    - Faults at end of previous test: 2
+    - Faults at end of current test:  3
+    - Area of this piece: (3 + 2) / 2 = 2.5
+    - Running total for actual_area: 4.0
+  - Interval 3 (between test 3 and 4):
+    - Faults at end of previous test: 3
+    - Faults at end of current test:  4
+    - Area of this piece: (4 + 3) / 2 = 3.5
+    - Running total for actual_area: 7.5
+
+  >>> FINAL Calculated Area (actual_area): 7.5
+-----------------------------------
+
+### STEP 5: 'PERFECT' SCENARIO CALCULATION ###
+Max faults (4) * (Number of tests (4) - 1) = 12
+  >>> 'Perfect' Area (perfect_area): 12
+------------------------------------------
+
+### STEP 6: FINAL SCORE CALCULATION ###
+  >>> Final Score = actual_area (7.5) / perfect_area (12) = 0.625
+-------------------------------------
+
+
+--- Fault Discovery Analysis ---
+Analysis complete. Plot saved to '/home/vagrant-cc-enhanced/Desktop/discovery_curve.png'
+A score of 1.0 represents a perfect test suite (all faults found on the first test).
+Your Test Suite's Discovery Score: 0.6250
+
