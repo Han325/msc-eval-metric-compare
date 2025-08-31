@@ -1,6 +1,6 @@
 # Dimeshift Coverage Comparison Report
 
-**Generated:** 2025-08-31 13:07:32
+**Generated:** 2025-08-31 15:42:50
 
 **Baseline runs:** 20
 **Enhanced runs:** 20
@@ -12,7 +12,9 @@
 | Metric | Baseline | Enhanced | Difference |
 |--------|----------|----------|------------|
 | Average Score | 0.6344 | 0.6691 | +0.0347 |
+| Median Score | 0.6481 | 0.6786 | +0.0305 |
 | Std Deviation | 0.0698 | 0.0595 | -0.0104 |
+| IQR | 0.0875 | 0.0882 | +0.0007 |
 | Min Score | 0.4722 | 0.5833 | +0.1111 |
 | Max Score | 0.7143 | 0.8000 | +0.0857 |
 | Data Points | 20 | 20 | - |
@@ -22,7 +24,9 @@
 | Metric | Baseline | Enhanced | Difference |
 |--------|----------|----------|------------|
 | Average AUC | 46.37 | 38.12 | -8.26 |
+| Median AUC | 39.51 | 34.21 | -5.30 |
 | Std Deviation | 28.58 | 14.30 | -14.28 |
+| IQR | 15.28 | 14.96 | -0.32 |
 | Min AUC | 28.02 | 16.73 | -11.29 |
 | Max AUC | 161.46 | 68.03 | -93.43 |
 | Data Points | 20 | 20 | - |
@@ -32,7 +36,9 @@
 | Metric | Baseline | Enhanced | Difference |
 |--------|----------|----------|------------|
 | Average Coverage | 40.33% | 38.91% | -1.43% |
+| Median Coverage | 40.23% | 39.26% | -0.98% |
 | Std Deviation | 1.15% | 2.15% | +0.99% |
+| IQR | 1.79% | 1.64% | -0.14% |
 | Min Coverage | 38.61% | 32.78% | -5.83% |
 | Max Coverage | 42.59% | 41.39% | -1.20% |
 | Data Points | 20 | 20 | - |

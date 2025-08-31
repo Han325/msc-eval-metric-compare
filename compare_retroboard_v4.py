@@ -8,6 +8,7 @@ from collections import defaultdict
 import datetime
 import re
 import statistics
+import shutil
 
 # NEW IMPORTS FOR STATISTICAL ANALYSIS
 import pingouin as pg
@@ -238,18 +239,33 @@ def load_all_unique_faults(base_dir, tool_name):
 
 # --- END OF NEW FUNCTIONS ---
 
+# --- MODIFIED FUNCTION ---
 def calculate_auc_statistics(data_list):
-    """Calculate mean, std dev, min, max for a list of values."""
+    """Calculate mean, median, std dev, IQR, min, max for a list of values."""
     if not data_list:
-        return {'mean': 0, 'std': 0, 'min': 0, 'max': 0, 'count': 0}
+        return {'mean': 0, 'median': 0, 'std': 0, 'iqr': 0, 'min': 0, 'max': 0, 'count': 0}
     
-    return {
+    stats_dict = {
         'mean': statistics.mean(data_list),
-        'std': statistics.stdev(data_list) if len(data_list) > 1 else 0,
+        'median': statistics.median(data_list),
         'min': min(data_list),
         'max': max(data_list),
         'count': len(data_list)
     }
+    
+    if len(data_list) > 1:
+        stats_dict['std'] = statistics.stdev(data_list)
+        # IQR requires at least two points to calculate quantiles
+        try:
+            quantiles = statistics.quantiles(data_list, n=4)
+            stats_dict['iqr'] = quantiles[2] - quantiles[0]
+        except statistics.StatisticsError:
+             stats_dict['iqr'] = 0
+    else:
+        stats_dict['std'] = 0
+        stats_dict['iqr'] = 0
+    
+    return stats_dict
 
 def format_branch_info(branch_key, baseline_coverage=None, enhanced_coverage=None):
     """
@@ -494,12 +510,12 @@ def analyze_coverage_comparison(base_dir="."):
 
     # Generate report
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    report_file = f"coverage_comparison_report_{timestamp}.md"
+    report_file = f"retroboard_coverage_comparison_report_{timestamp}.md"
     
     print(f"\n📝 Generating detailed report: {report_file}")
     
     with open(report_file, 'w', encoding='utf-8') as f:
-        f.write("# Coverage Comparison Report\n\n")
+        f.write("# Retroboard Coverage Comparison Report\n\n")
         f.write(f"**Generated:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         f.write(f"**Baseline runs:** {len(baseline_files)}\n")
         f.write(f"**Enhanced runs:** {len(enhanced_files)}\n\n")
@@ -507,32 +523,41 @@ def analyze_coverage_comparison(base_dir="."):
         # AUC Analysis Section
         f.write("## 🚀 AUC Performance Analysis\n\n")
         
+        # --- MODIFIED TABLE SECTION 1 ---
         # Fault Discovery AUC
         f.write("### 🎯 Fault Discovery Performance\n\n")
         f.write("| Metric | Baseline | Enhanced | Difference |\n")
         f.write("|--------|----------|----------|------------|\n")
         f.write(f"| Average Score | {baseline_fault_stats['mean']:.4f} | {enhanced_fault_stats['mean']:.4f} | {enhanced_fault_stats['mean'] - baseline_fault_stats['mean']:+.4f} |\n")
+        f.write(f"| Median Score | {baseline_fault_stats['median']:.4f} | {enhanced_fault_stats['median']:.4f} | {enhanced_fault_stats['median'] - baseline_fault_stats['median']:+.4f} |\n")
         f.write(f"| Std Deviation | {baseline_fault_stats['std']:.4f} | {enhanced_fault_stats['std']:.4f} | {enhanced_fault_stats['std'] - baseline_fault_stats['std']:+.4f} |\n")
+        f.write(f"| IQR | {baseline_fault_stats['iqr']:.4f} | {enhanced_fault_stats['iqr']:.4f} | {enhanced_fault_stats['iqr'] - baseline_fault_stats['iqr']:+.4f} |\n")
         f.write(f"| Min Score | {baseline_fault_stats['min']:.4f} | {enhanced_fault_stats['min']:.4f} | {enhanced_fault_stats['min'] - baseline_fault_stats['min']:+.4f} |\n")
         f.write(f"| Max Score | {baseline_fault_stats['max']:.4f} | {enhanced_fault_stats['max']:.4f} | {enhanced_fault_stats['max'] - baseline_fault_stats['max']:+.4f} |\n")
         f.write(f"| Data Points | {baseline_fault_stats['count']} | {enhanced_fault_stats['count']} | - |\n\n")
         
+        # --- MODIFIED TABLE SECTION 2 ---
         # Branch Coverage AUC
         f.write("### 📈 Branch Coverage Growth (AUC)\n\n")
         f.write("| Metric | Baseline | Enhanced | Difference |\n")
         f.write("|--------|----------|----------|------------|\n")
         f.write(f"| Average AUC | {baseline_cov_auc_stats['mean']:.2f} | {enhanced_cov_auc_stats['mean']:.2f} | {enhanced_cov_auc_stats['mean'] - baseline_cov_auc_stats['mean']:+.2f} |\n")
+        f.write(f"| Median AUC | {baseline_cov_auc_stats['median']:.2f} | {enhanced_cov_auc_stats['median']:.2f} | {enhanced_cov_auc_stats['median'] - baseline_cov_auc_stats['median']:+.2f} |\n")
         f.write(f"| Std Deviation | {baseline_cov_auc_stats['std']:.2f} | {enhanced_cov_auc_stats['std']:.2f} | {enhanced_cov_auc_stats['std'] - baseline_cov_auc_stats['std']:+.2f} |\n")
+        f.write(f"| IQR | {baseline_cov_auc_stats['iqr']:.2f} | {enhanced_cov_auc_stats['iqr']:.2f} | {enhanced_cov_auc_stats['iqr'] - baseline_cov_auc_stats['iqr']:+.2f} |\n")
         f.write(f"| Min AUC | {baseline_cov_auc_stats['min']:.2f} | {enhanced_cov_auc_stats['min']:.2f} | {enhanced_cov_auc_stats['min'] - baseline_cov_auc_stats['min']:+.2f} |\n")
         f.write(f"| Max AUC | {baseline_cov_auc_stats['max']:.2f} | {enhanced_cov_auc_stats['max']:.2f} | {enhanced_cov_auc_stats['max'] - baseline_cov_auc_stats['max']:+.2f} |\n")
         f.write(f"| Data Points | {baseline_cov_auc_stats['count']} | {enhanced_cov_auc_stats['count']} | - |\n\n")
         
+        # --- MODIFIED TABLE SECTION 3 ---
         # Final Coverage
         f.write("### 🎯 Final Branch Coverage\n\n")
         f.write("| Metric | Baseline | Enhanced | Difference |\n")
         f.write("|--------|----------|----------|------------|\n")
         f.write(f"| Average Coverage | {baseline_final_cov_stats['mean']:.2f}% | {enhanced_final_cov_stats['mean']:.2f}% | {enhanced_final_cov_stats['mean'] - baseline_final_cov_stats['mean']:+.2f}% |\n")
+        f.write(f"| Median Coverage | {baseline_final_cov_stats['median']:.2f}% | {enhanced_final_cov_stats['median']:.2f}% | {enhanced_final_cov_stats['median'] - baseline_final_cov_stats['median']:+.2f}% |\n")
         f.write(f"| Std Deviation | {baseline_final_cov_stats['std']:.2f}% | {enhanced_final_cov_stats['std']:.2f}% | {enhanced_final_cov_stats['std'] - baseline_final_cov_stats['std']:+.2f}% |\n")
+        f.write(f"| IQR | {baseline_final_cov_stats['iqr']:.2f}% | {enhanced_final_cov_stats['iqr']:.2f}% | {enhanced_final_cov_stats['iqr'] - baseline_final_cov_stats['iqr']:+.2f}% |\n")
         f.write(f"| Min Coverage | {baseline_final_cov_stats['min']:.2f}% | {enhanced_final_cov_stats['min']:.2f}% | {enhanced_final_cov_stats['min'] - baseline_final_cov_stats['min']:+.2f}% |\n")
         f.write(f"| Max Coverage | {baseline_final_cov_stats['max']:.2f}% | {enhanced_final_cov_stats['max']:.2f}% | {enhanced_final_cov_stats['max'] - baseline_final_cov_stats['max']:+.2f}% |\n")
         f.write(f"| Data Points | {baseline_final_cov_stats['count']} | {enhanced_final_cov_stats['count']} | - |\n\n")
