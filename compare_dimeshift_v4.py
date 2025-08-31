@@ -8,6 +8,12 @@ from collections import defaultdict
 import datetime
 import re
 import statistics
+import shutil
+
+# NEW IMPORTS FOR STATISTICAL ANALYSIS
+import pingouin as pg
+import pandas as pd
+
 
 def load_all_coverage_files(base_dir, tool_name):
     """
@@ -174,6 +180,57 @@ def load_auc_data(base_dir, tool_name):
     print(f"📊 {tool_name.capitalize()} AUC data: {len(auc_data['fault_scores'])} fault scores, {len(auc_data['branch_coverage_auc'])} coverage AUCs")
     return auc_data
 
+# --- NEW FUNCTIONS FOR UNIQUE FAULT ANALYSIS ---
+
+def normalize_fault_line(line):
+    """
+    Removes transient parts of a fault string, like timestamps, to group similar faults.
+    """
+    # This regex finds and removes "?_=[any sequence of digits]" from the line.
+    return re.sub(r'\?_=\d+', '', line)
+
+def parse_unique_faults_file(file_path):
+    """
+    Parse a unique_faults.txt file and return a set of NORMALIZED fault strings.
+    """
+    faults = set()
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                # Exclude header/footer and empty lines
+                if line and not line.startswith("---"):
+                    # NORMALIZE the line before adding it to the set
+                    normalized_line = normalize_fault_line(line)
+                    faults.add(normalized_line)
+    except Exception as e:
+        print(f"⚠️  Error parsing unique faults file {file_path}: {e}")
+    return faults
+
+def load_all_unique_faults(base_dir, tool_name):
+    """
+    Load and aggregate all unique faults for a given tool across all runs.
+    """
+    tool_dir = Path(base_dir) / f"dimeshift-{tool_name}-20-run-cc"
+    aggregated_faults = set()
+    
+    if not tool_dir.exists():
+        # This case is handled by the coverage loader, but good practice to check
+        return aggregated_faults
+
+    for run_num in range(1, 21):
+        fault_file = tool_dir / str(run_num) / "unique_faults.txt"
+        if fault_file.exists():
+            run_faults = parse_unique_faults_file(fault_file)
+            aggregated_faults.update(run_faults)
+        else:
+            print(f"⚠️  Missing unique faults file: {fault_file}")
+            
+    print(f"🐞 {tool_name.capitalize()} unique faults: Found {len(aggregated_faults)} unique fault types across all runs.")
+    return aggregated_faults
+
+# --- END OF NEW FUNCTIONS ---
+
 def calculate_auc_statistics(data_list):
     """Calculate mean, std dev, min, max for a list of values."""
     if not data_list:
@@ -284,6 +341,83 @@ def copy_relevant_test_files(only_in_enhanced, enhanced_files, enhanced_hit_freq
     print(f"✅ Copied {len(copied_files)} test files to {output_dir}/")
     return output_dir
 
+# --- NEW FUNCTION FOR STATISTICAL ANALYSIS (BUG FIXED) ---
+def run_and_format_stat_tests(baseline_data, enhanced_data):
+    """
+    Runs Mann-Whitney U and calculates A12 effect size for all metrics,
+    and returns a formatted Markdown table. (A12 calculation is now corrected)
+    """
+    if not all(k in baseline_data and k in enhanced_data for k in ['fault_scores', 'branch_coverage_auc', 'branch_coverage_final']):
+        return "## 🔬 Statistical Significance Analysis\n\n- Data missing for statistical analysis.\n"
+        
+    results = []
+    n1 = len(enhanced_data['fault_scores'])
+    n2 = len(baseline_data['fault_scores'])
+    
+    # 1. Fault Discovery (Higher is better for Enhanced)
+    mwu_fault = pg.mwu(x=enhanced_data['fault_scores'], y=baseline_data['fault_scores'], alternative='greater')
+    p_val_fault = mwu_fault['p-val'].iloc[0]
+    # Correct A12 = U / (n1 * n2). For 'greater', U is the number of times X > Y.
+    u_val_fault = mwu_fault['U-val'].iloc[0]
+    a12_fault = u_val_fault / (n1 * n2)
+    results.append({
+        'Metric': 'Fault Discovery Score', 'p-value': p_val_fault, 'A12': a12_fault, 
+        'Interpretation': 'Higher is better'
+    })
+    
+    # 2. Branch Coverage Growth (AUC) (LOWER is better for Enhanced)
+    mwu_auc = pg.mwu(x=enhanced_data['branch_coverage_auc'], y=baseline_data['branch_coverage_auc'], alternative='less')
+    p_val_auc = mwu_auc['p-val'].iloc[0]
+    # For 'less', U is the number of times X < Y.
+    u_val_auc = mwu_auc['U-val'].iloc[0]
+    a12_auc = u_val_auc / (n1 * n2)
+    results.append({
+        'Metric': 'Branch Coverage Growth (AUC)', 'p-value': p_val_auc, 'A12': a12_auc,
+        'Interpretation': 'Lower is better (faster)'
+    })
+
+    # 3. Final Branch Coverage (Higher is better for Enhanced)
+    mwu_final = pg.mwu(x=enhanced_data['branch_coverage_final'], y=baseline_data['branch_coverage_final'], alternative='greater')
+    p_val_final = mwu_final['p-val'].iloc[0]
+    u_val_final = mwu_final['U-val'].iloc[0]
+    a12_final = u_val_final / (n1 * n2)
+    results.append({
+        'Metric': 'Final Branch Coverage', 'p-value': p_val_final, 'A12': a12_final,
+        'Interpretation': 'Higher is better'
+    })
+    
+    # Format the table
+    report = "## 🔬 Statistical Significance Analysis\n\n"
+    report += "| Metric | p-value | A₁₂ (Enhanced vs. Baseline) | Conclusion |\n"
+    report += "|:---|:---:|:---:|:---|\n"
+    
+    for res in results:
+        p_str = f"**{res['p-value']:.3f}**" if res['p-value'] < 0.05 else f"{res['p-value']:.3f}"
+        
+        a12 = res['A12']
+        effect_size = ""
+        # Effect size thresholds for A12
+        if a12 > 0.71 or a12 < 0.29: effect_size = "large"
+        elif a12 > 0.64 or a12 < 0.36: effect_size = "medium"
+        elif a12 > 0.56 or a12 < 0.44: effect_size = "small"
+        else: effect_size = "negligible"
+        
+        conclusion = "Not Statistically Significant"
+        if res['p-value'] < 0.05:
+            advantage = "Enhanced" if a12 > 0.5 else "Baseline"
+            conclusion = f"**Significant**, with a **{effect_size}** effect size in favor of **{advantage}**."
+        elif effect_size != "negligible":
+             conclusion = f"Not significant, but a **{effect_size} effect size** trend was observed."
+
+
+        report += f"| **{res['Metric']}** | {p_str} | {a12:.3f} | {conclusion} |\n"
+        
+    report += "\n*The **p-value** indicates statistical significance (p < 0.05 is significant).*\n"
+    report += "*The **A₁₂ effect size** measures the probability that a random run from 'Enhanced' will outperform a random run from 'Baseline'. 0.5 is no difference, >0.5 favors Enhanced.*\n"
+
+    return report
+
+
 def analyze_coverage_comparison(base_dir="."):
     """
     Main analysis function comparing baseline vs enhanced coverage AND AUC metrics.
@@ -305,6 +439,11 @@ def analyze_coverage_comparison(base_dir="."):
     print("\n🔍 Loading AUC data...")
     baseline_auc = load_auc_data(base_dir, "baseline")
     enhanced_auc = load_auc_data(base_dir, "enhanced")
+
+    # NEW: Load unique fault data
+    print("\n🔍 Loading unique fault data...")
+    baseline_faults = load_all_unique_faults(base_dir, "baseline")
+    enhanced_faults = load_all_unique_faults(base_dir, "enhanced")
     
     print("="*80)
     
@@ -317,6 +456,11 @@ def analyze_coverage_comparison(base_dir="."):
     only_in_enhanced = enhanced_union - baseline_union
     only_in_baseline = baseline_union - enhanced_union
     shared_branches = baseline_union & enhanced_union
+
+    # NEW: Unique Fault analysis
+    faults_only_in_enhanced = enhanced_faults - baseline_faults
+    faults_only_in_baseline = baseline_faults - enhanced_faults
+    shared_faults = baseline_faults & enhanced_faults
     
     # Consistency analysis for shared branches
     enhanced_more_consistent = []
@@ -348,7 +492,7 @@ def analyze_coverage_comparison(base_dir="."):
     
     print(f"\n📝 Generating detailed report: {report_file}")
     
-    with open(report_file, 'w') as f:
+    with open(report_file, 'w', encoding='utf-8') as f:
         f.write("# Coverage Comparison Report\n\n")
         f.write(f"**Generated:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         f.write(f"**Baseline runs:** {len(baseline_files)}\n")
@@ -386,6 +530,34 @@ def analyze_coverage_comparison(base_dir="."):
         f.write(f"| Min Coverage | {baseline_final_cov_stats['min']:.2f}% | {enhanced_final_cov_stats['min']:.2f}% | {enhanced_final_cov_stats['min'] - baseline_final_cov_stats['min']:+.2f}% |\n")
         f.write(f"| Max Coverage | {baseline_final_cov_stats['max']:.2f}% | {enhanced_final_cov_stats['max']:.2f}% | {enhanced_final_cov_stats['max'] - baseline_final_cov_stats['max']:+.2f}% |\n")
         f.write(f"| Data Points | {baseline_final_cov_stats['count']} | {enhanced_final_cov_stats['count']} | - |\n\n")
+        
+        # --- ADD THE NEW STATISTICAL ANALYSIS SECTION TO THE REPORT ---
+        f.write(run_and_format_stat_tests(baseline_auc, enhanced_auc))
+        f.write("\n")
+
+        # --- NEW FAULT ANALYSIS SECTION ---
+        f.write("## 🐞 Unique Fault Discovery Analysis\n\n")
+        f.write(f"- **Total unique fault types (Baseline):** {len(baseline_faults)}\n")
+        f.write(f"- **Total unique fault types (Enhanced):** {len(enhanced_faults)}\n")
+        f.write(f"- **Shared fault types found by both:** {len(shared_faults)}\n")
+        f.write(f"- **Fault types found ONLY by Enhanced:** {len(faults_only_in_enhanced)}\n")
+        f.write(f"- **Fault types found ONLY by Baseline:** {len(faults_only_in_baseline)}\n\n")
+
+        f.write("### Fault Types Found ONLY by Enhanced Tool\n\n")
+        if faults_only_in_enhanced:
+            for fault in sorted(list(faults_only_in_enhanced)):
+                f.write(f"- `{fault}`\n")
+        else:
+            f.write("*None found.*\n")
+        f.write("\n")
+
+        f.write("### Fault Types Found ONLY by Baseline Tool\n\n")
+        if faults_only_in_baseline:
+            for fault in sorted(list(faults_only_in_baseline)):
+                f.write(f"- `{fault}`\n")
+        else:
+            f.write("*None found.*\n")
+        f.write("\n")
         
         # Summary statistics
         f.write("## 📊 Branch Discovery Summary\n\n")
@@ -473,6 +645,14 @@ def analyze_coverage_comparison(base_dir="."):
     print(f"   Fault Discovery (avg): Baseline {baseline_fault_stats['mean']:.4f} vs Enhanced {enhanced_fault_stats['mean']:.4f}")
     print(f"   Coverage Growth (avg): Baseline {baseline_cov_auc_stats['mean']:.2f} vs Enhanced {enhanced_cov_auc_stats['mean']:.2f}")
     print(f"   Final Coverage (avg): Baseline {baseline_final_cov_stats['mean']:.2f}% vs Enhanced {enhanced_final_cov_stats['mean']:.2f}%")
+
+    # NEW: Unique Fault Summary
+    print(f"\n🐞 Unique Fault Discovery:")
+    print(f"   Baseline: {len(baseline_faults)} unique fault types")
+    print(f"   Enhanced: {len(enhanced_faults)} unique fault types")
+    print(f"   Shared: {len(shared_faults)} fault types")
+    print(f"   Fault types ONLY Enhanced finds: {len(faults_only_in_enhanced)}")
+    print(f"   Fault types ONLY Baseline finds: {len(faults_only_in_baseline)}")
     
     print(f"\n🔢 Branch Discovery:")
     print(f"   Baseline: {len(baseline_union)} unique branches")
@@ -517,9 +697,13 @@ def analyze_coverage_comparison(base_dir="."):
         print(f"   ✅ Enhanced discovers {len(only_in_enhanced)} unique branches never found by baseline")
     if len(enhanced_more_consistent) > 0:
         print(f"   ✅ Enhanced shows better consistency on {len(enhanced_more_consistent)} branches")
+
+    # NEW: Fault discovery insights
+    if len(faults_only_in_enhanced) > 0:
+        print(f"   ✅ Enhanced discovers {len(faults_only_in_enhanced)} unique fault types never found by baseline")
     
     if (len(only_in_enhanced) == 0 and len(enhanced_more_consistent) == 0 and 
-        fault_diff <= 0.01 and cov_auc_diff <= 5 and final_cov_diff <= 1):
+        fault_diff <= 0.01 and cov_auc_diff <= 5 and final_cov_diff <= 1 and len(faults_only_in_enhanced) == 0):
         print(f"   ⚠️  Enhanced shows limited advantages in this analysis")
         print(f"   💭 Consider: Are there other metrics to explore? Different thresholds?")
     else:

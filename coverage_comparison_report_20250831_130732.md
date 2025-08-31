@@ -1,6 +1,6 @@
-# Coverage Comparison Report
+# Dimeshift Coverage Comparison Report
 
-**Generated:** 2025-08-29 12:11:08
+**Generated:** 2025-08-31 13:07:32
 
 **Baseline runs:** 20
 **Enhanced runs:** 20
@@ -36,6 +36,35 @@
 | Min Coverage | 38.61% | 32.78% | -5.83% |
 | Max Coverage | 42.59% | 41.39% | -1.20% |
 | Data Points | 20 | 20 | - |
+
+## 🔬 Statistical Significance Analysis
+
+| Metric | p-value | A₁₂ (Enhanced vs. Baseline) | Conclusion |
+|:---|:---:|:---:|:---|
+| **Fault Discovery Score** | 0.098 | 0.620 | Not significant, but a **small effect size** trend was observed. |
+| **Branch Coverage Growth (AUC)** | 0.155 | 0.405 | Not significant, but a **small effect size** trend was observed. |
+| **Final Branch Coverage** | 0.992 | 0.280 | Not significant, but a **large effect size** trend was observed. |
+
+*The **p-value** indicates statistical significance (p < 0.05 is significant).*
+*The **A₁₂ effect size** measures the probability that a random run from 'Enhanced' will outperform a random run from 'Baseline'. 0.5 is no difference, >0.5 favors Enhanced.*
+
+## 🐞 Unique Fault Discovery Analysis
+
+- **Total unique fault types (Baseline):** 12
+- **Total unique fault types (Enhanced):** 12
+- **Shared fault types found by both:** 10
+- **Fault types found ONLY by Enhanced:** 2
+- **Fault types found ONLY by Baseline:** 2
+
+### Fault Types Found ONLY by Enhanced Tool
+
+- `http://webapp:8080/api/wallets/2/accesses/ - Failed to load resource: the server responded with a status of 500 (Internal Server Error)`
+- `http://webapp:8080/api/wallets/undefined - Failed to load resource: the server responded with a status of 500 (Internal Server Error)`
+
+### Fault Types Found ONLY by Baseline Tool
+
+- `http://webapp:8080/api/users/7/wallets - Failed to load resource: the server responded with a status of 500 (Internal Server Error)`
+- `http://webapp:8080/api/users/8/wallets - Failed to load resource: the server responded with a status of 500 (Internal Server Error)`
 
 ## 📊 Branch Discovery Summary
 

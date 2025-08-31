@@ -1,6 +1,6 @@
-# Coverage Comparison Report
+# Retroboard Coverage Comparison Report
 
-**Generated:** 2025-08-29 12:11:21
+**Generated:** 2025-08-31 13:07:40
 
 **Baseline runs:** 20
 **Enhanced runs:** 20
@@ -36,6 +36,33 @@
 | Min Coverage | 67.25% | 66.67% | -0.58% |
 | Max Coverage | 74.85% | 74.27% | -0.58% |
 | Data Points | 20 | 20 | - |
+
+## 🔬 Statistical Significance Analysis
+
+| Metric | p-value | A₁₂ (Enhanced vs. Baseline) | Conclusion |
+|:---|:---:|:---:|:---|
+| **Fault Discovery Score** | 0.345 | 0.522 | Not Statistically Significant |
+| **Branch Coverage Growth (AUC)** | **0.000** | 0.115 | **Significant**, with a **large** effect size in favor of **Baseline**. |
+| **Final Branch Coverage** | 0.993 | 0.275 | Not significant, but a **large effect size** trend was observed. |
+
+*The **p-value** indicates statistical significance (p < 0.05 is significant).*
+*The **A₁₂ effect size** measures the probability that a random run from 'Enhanced' will outperform a random run from 'Baseline'. 0.5 is no difference, >0.5 favors Enhanced.*
+
+## 🐞 Unique Fault Discovery Analysis
+
+- **Total unique fault types (Baseline):** 1
+- **Total unique fault types (Enhanced):** 1
+- **Shared fault types found by both:** 1
+- **Fault types found ONLY by Enhanced:** 0
+- **Fault types found ONLY by Baseline:** 0
+
+### Fault Types Found ONLY by Enhanced Tool
+
+*None found.*
+
+### Fault Types Found ONLY by Baseline Tool
+
+*None found.*
 
 ## 📊 Branch Discovery Summary
 

@@ -47,7 +47,8 @@ project/
 │   │   ├── test[app]LLM_0/
 │   │   │   └── coverage-final.json
 │   │   ├── fault-auc.txt
-│   │   └── results-auc.txt
+│   │   ├── results-auc.txt
+│   │   └── unique_faults.txt
 │   └── ...                       # Runs 2-15
 └── [app]-enhanced-15-run-cc/     # Enhanced tool results
     └── [same structure as baseline]
